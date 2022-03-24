@@ -1,6 +1,6 @@
 Example Voting App
 =========
-
+Edited by: Manuh
 Getting started
 ---------------
 
