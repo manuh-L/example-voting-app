@@ -45,8 +45,8 @@ pipeline {
     }
     post { 
         always { 
-            echo 'Build pipeline for worker app is complete'
-            echo ' a test pipeline by manuh....'
+            echo 'Build pipeline for result app is complete'
+            echo 'learnt by doing'
         }
         failure { 
             slackSend (channel: "instavote-cd", message: "Build Failed - ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)")
