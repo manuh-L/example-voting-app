@@ -1,7 +1,7 @@
 pipeline {
     agent any
     tools {
-        maven 'NodeJS 8.9.0' 
+        nodejs 'NodeJS 8.9.0' 
     }
     stages { 
         stage('Build') {
@@ -21,26 +21,27 @@ pipeline {
                changeset "**/result/**" //when code change on worker
              }            
             steps {
-                echo 'Running Unit Tests on worker app'
-                dir('worker'){
-                    sh 'mvn clean test'
+                echo 'Running Unit Tests on result application'
+                dir('result'){
+                    sh 'npm install'
+                    sh 'npm test'
                 }
             }
         }
-        stage('Package') {
-            when{
-               branch 'master'
-               changeset "**/worker/**" //when code chanfe on worker
-             }
-            steps {
-                echo 'Packaging worker app'
-                dir('worker'){
-                    sh 'mvn package -DskipTests'
-                    archiveArtifacts artifacts: '**/target/*.jar', fingerprint: true                   
-                }
+//        stage('Package') {
+//            when{
+//               branch 'master'
+//               changeset "**/worker/**" //when code chanfe on worker
+//             }
+//            steps {
+//                echo 'Packaging worker app'
+//                dir('worker'){
+//                    sh 'mvn package -DskipTests'
+//                    archiveArtifacts artifacts: '**/target/*.jar', fingerprint: true                   
+//                }
                 
-            }
-        }
+//            }
+//        }
     }
     post { 
         always { 
