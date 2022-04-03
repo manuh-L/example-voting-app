@@ -1,0 +1,49 @@
+pipeline {
+    agent {
+        docker {
+            image 'python:2.7.16-slim'
+            args '--user root'
+        }
+    }
+
+
+    stages { 
+        stage('Build') {
+            when{
+               changeset "**/vote/**" //when code chanfe on worker
+             }
+            steps {
+                echo 'Compiling vote app'
+                dir('vote'){
+                    sh 'pip install -r requirements.txt'
+
+                }
+            }
+        }
+        stage('Test') {
+            when{
+               changeset "**/vote/**" //when code change on worker
+             }            
+            steps {
+                echo 'Running Unit Tests on vote application'
+                dir('vote'){
+                    sh 'nosetests -v'
+                }
+            }
+        }
+
+    }
+    post { 
+        always { 
+            echo 'Build pipeline for result vote is complete'
+            echo 'learnt by doing'
+        }
+        failure { 
+            slackSend (channel: "instavote-cd", message: "Build Failed - ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)")
+        }
+        success { 
+            slackSend (channel: "instavote-cd", message: "Build Succeede - ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)")
+            
+        }
+    }
+}
