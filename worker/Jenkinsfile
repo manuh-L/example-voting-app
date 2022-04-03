@@ -1,8 +1,11 @@
 pipeline {
-    agent any
-    tools {
-        maven 'Maven 3.6.1' 
+    agent {
+        docker {
+            image 'maven:3.8-openjdk-11-slim'
+            args '-v $HOME/.m2:/root/.m2'
+        }
     }
+
     stages { 
         stage('Build') {
             when{
@@ -50,7 +53,7 @@ pipeline {
             slackSend (channel: "instavote-cd", message: "Build Failed - ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)")
         }
         success { 
-            slackSend (channel: "instavote-cd", message: "Build Succeede - ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)")
+            slackSend (channel: "instavote-cd", message: "Build Succeed - ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)")
             
         }
     }
