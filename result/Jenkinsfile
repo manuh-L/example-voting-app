@@ -1,0 +1,59 @@
+pipeline {
+    agent any
+    tools {
+        nodejs 'NodeJS 8.9.0' 
+    }
+    stages { 
+        stage('Build') {
+            when{
+               changeset "**/result/**" //when code chanfe on worker
+             }
+            steps {
+                echo 'Compiling result application'
+                dir('result'){
+                    sh 'npm install'
+                    sh 'npm ls'
+                }
+            }
+        }
+        stage('Test') {
+            when{
+               changeset "**/result/**" //when code change on worker
+             }            
+            steps {
+                echo 'Running Unit Tests on result application'
+                dir('result'){
+                    sh 'npm install'
+                    sh 'npm test'
+                }
+            }
+        }
+//        stage('Package') {
+//            when{
+//               branch 'master'
+//               changeset "**/worker/**" //when code chanfe on worker
+//             }
+//            steps {
+//                echo 'Packaging worker app'
+//                dir('worker'){
+//                    sh 'mvn package -DskipTests'
+//                    archiveArtifacts artifacts: '**/target/*.jar', fingerprint: true                   
+//                }
+                
+//            }
+//        }
+    }
+    post { 
+        always { 
+            echo 'Build pipeline for result app is complete'
+            echo 'learnt by doing'
+        }
+        failure { 
+            slackSend (channel: "instavote-cd", message: "Build Failed - ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)")
+        }
+        success { 
+            slackSend (channel: "instavote-cd", message: "Build Succeede - ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)")
+            
+        }
+    }
+}
