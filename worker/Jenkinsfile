@@ -64,7 +64,7 @@ pipeline {
         stage('docker-package') {
             agent any
             when{
-               //branch 'master'
+               branch 'master'
                changeset "**/worker/**" //when code chanfe on worker
              }
             steps {
@@ -76,7 +76,7 @@ pipeline {
 
                         /* Push the container to the custom Registry */
                         workerImage.push()
-                        workerImage.push("${env.BUILD_ID}") //push the image to docker hub with branch name as tag
+                        workerImage.push("${env.BRANCHE_NAME}") //push the image to docker hub with branch name as tag env.BRANCH_NAME
     }
                 }
                 
