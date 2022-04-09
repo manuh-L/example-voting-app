@@ -3,12 +3,13 @@ pipeline {
 
 
     stages {
-        agent {
-            docker {
-                image 'node:8.16.0-alpine'
-                }
-            }
+
         stage('Build') {
+            agent {
+                docker {
+                    image 'node:8.16.0-alpine'
+                    }
+                }
             when{
                changeset "**/result/**" //when code chanfe on worker
              }
