@@ -70,7 +70,7 @@ pipeline {
             steps {
                 echo 'Packaging worker app with docker'
                 script{
-                        docker.withRegistry('https://index.docker.io/v1', 'dockerlogin') {
+                        docker.withRegistry('https://index.docker.io/v1/', 'dockerlogin') {
 
                         def workerimage = docker.build("nhiuana/worker:${env.BUILD_ID}", "./worker") //build the image with build number as tag
 
