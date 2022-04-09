@@ -1,13 +1,16 @@
 pipeline {
-    agent {
-        docker {
-            image 'maven:3.8-openjdk-11-slim'
-            args '-v $HOME/.m2:/root/.m2'
-        }
-    }
+
+    agent none
 
     stages { 
         stage('Build') {
+            agent {
+                docker {
+                    image 'maven:3.8-openjdk-11-slim'
+                    args '-v $HOME/.m2:/root/.m2'
+                    }
+                }
+            
             when{
                changeset "**/worker/**" //when code chanfe on worker
              }
@@ -19,6 +22,13 @@ pipeline {
             }
         }
         stage('Test') {
+             agent {
+                docker {
+                    image 'maven:3.8-openjdk-11-slim'
+                    args '-v $HOME/.m2:/root/.m2'
+                    }
+                }
+            
             when{
                changeset "**/worker/**" //when code chanfe on worker
              }            
@@ -30,9 +40,16 @@ pipeline {
             }
         }
         stage('Package') {
+         agent {
+                docker {
+                    image 'maven:3.8-openjdk-11-slim'
+                    args '-v $HOME/.m2:/root/.m2'
+                    }
+                }
+            
             when{
                branch 'master'
-               changeset "**/worker/**" //when code chanfe on worker
+               changeset "**/worker/**" //when code change on worker
              }
             steps {
                 echo 'Packaging worker app'
@@ -43,6 +60,29 @@ pipeline {
                 
             }
         }
+
+        stage('docker-package') {
+            agent any
+            when{
+               branch 'master'
+               changeset "**/worker/**" //when code chanfe on worker
+             }
+            steps {
+                echo 'Packaging worker app with docker'
+                script{
+                        docker.withRegistry('https://index.docker.io/v1/', 'dockerlogin') {
+
+                        def workerImage = docker.build("nhiuana/worker:v${env.BUILD_ID}", "./worker") //build the image with build number as tag
+
+                        /* Push the container to the custom Registry */
+                        workerImage.push()
+                        workerImage.push("${env.BRANCHE_NAME}") //push the image to docker hub with branch name as tag env.BRANCH_NAME
+    }
+                }
+                
+            }
+        }
+
     }
     post { 
         always { 
