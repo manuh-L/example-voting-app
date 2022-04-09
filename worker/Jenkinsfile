@@ -43,6 +43,28 @@ pipeline {
                 
             }
         }
+
+        stage('docker-package') {
+            when{
+               branch 'master'
+               changeset "**/worker/**" //when code chanfe on worker
+             }
+            steps {
+                echo 'Packaging worker app with docker'
+                script{
+                        docker.withRegistry('https://index.docker.io/v1', 'dockerlogin') {
+
+                        def workerimage = docker.build("nhiuana/worker:${env.BUILD_ID}", "./worker") //build the image with build number as tag
+
+                        /* Push the container to the custom Registry */
+                        workerimage.push()
+                        workerimage.push("${env.BRANCH_NAME}") //push the image to docker hub with branch name as tag
+    }
+                }
+                
+            }
+        }
+
     }
     post { 
         always { 
