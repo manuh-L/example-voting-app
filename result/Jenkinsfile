@@ -54,7 +54,7 @@ pipeline {
 
                         /* Push the container to the custom Registry */
                         workerImage.push()
-                        workerImage.push("${env.BRANCH_NAME}") //push the image to docker hub with branch name as tag env.BRANCH_NAME
+                        workerImage.push("${env.BRANCH_NAME}") //push the image to docker hub with branch name as tag
     }
                 }
                 
@@ -78,7 +78,6 @@ pipeline {
     post { 
         always { 
             echo 'Build pipeline for result app is complete'
-            echo 'learnt by doing'
         }
         failure { 
             slackSend (channel: "instavote-cd", message: "Build Failed - ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)")
